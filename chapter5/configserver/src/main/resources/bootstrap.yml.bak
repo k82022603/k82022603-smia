@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:/home/jeff/SprintMicroservicesInAction/bjy/chapter5/configserver/src/main/resources/config
+    
+server:
+  port: 8071
