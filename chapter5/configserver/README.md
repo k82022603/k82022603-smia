@@ -28,10 +28,31 @@ $ git clone https://github.com/ihuaylupo/manning-smia
 2. chapter5/configserver/src/main/resources/application.yml
 - move bootstrap.yml to application.yml
 
-# The build command
+# The build command (1) using Dockerfile
+## Changes
+1. chapter5/configserver/Dockerfile
+- java version & LABEL
+FROM openjdk:17-slim as build
+LABEL maintainer="k82022603 <k82022603@gmail.com>"
+FROM openjdk:17-slim
+
+## The build command
+- mvn clean package dockerfile:build
+- run "docker images" to find out the docker image
+REPOSITORY                 TAG              IMAGE ID       CREATED         SIZE
+ostock/configserver        0.0.1-SNAPSHOT   b03f832d2cfb   7 minutes ago   442MB
 
 
+
+# The Run command using the docker
 # The Run command
+$ docker run -d --name "configserver" -p 8071:8071 ostock/configserver:0.0.1-SNAPSHOT
+$ docker ps
+CONTAINER ID   IMAGE                                COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+c3fbf002187c   ostock/configserver:0.0.1-SNAPSHOT   "java -cp app:app/li…"   3 minutes ago   Up 3 minutes   0.0.0.0:8071->8071/tcp, :::8071->8071/tcp   configserver
+
+
+# The Run command using (2) mvn sprint-boot:run
 # Go into the repository, by chaning to the directory where you have downloaded the 
 # chapter 5 source code
 $ cd chapter5/configserver

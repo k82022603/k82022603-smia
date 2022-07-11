@@ -24,7 +24,11 @@ $ cd chapter5/licensing-service/
 
 # Database
 You can find the database script as well in the docker directory.
-If you want dev env, create schema ostock_dev and run the DDL/DML scripts. It uses "spring.datasource.url=jdbc:postgresql://localhost:5432/ostock_dev"
+-- If you want "dev" environment, create schema "ostock_dev" and run the DDL/DML scripts in the "ostock_dev". It uses "spring.datasource.url=jdbc:postgresql://localhost:5432/ostock_dev"
+
+If not running postgresql, start it 
+$ sudo systemctl start postgresql.service
+
 ## Changes
 1. chapter5/configserver/pom.xml 
 - java version & spring-cloud version
@@ -55,7 +59,7 @@ ostock/licensing-service   0.0.1-SNAPSHOT   dd6fafa1cadc   33 seconds ago   459M
 
 # The Run command using the docker
 ## Changes to fix trouble shootings
-1. $ docker run ostock/licensing-service:0.0.3-SNAPSHOT
+1. $ docker run ostock/licensing-service:0.0.1-SNAPSHOT
 2022-07-07 08:08:28.193 WARN 1 --- [ main] o.s.c.c.c.ConfigServerConfigDataLoader : Could not locate PropertySource ([ConfigServerConfigDataResource@1eb6749b uris = array<String>['[http://localhost:8071](http://localhost:8071/)'], optional = true, profiles = list['dev']]): I/O error on GET request for "[http://localhost:8071/licensing-service/dev](http://localhost:8071/licensing-service/dev)": Connection refused; nested exception is java.net.ConnectException: Connection refused
 --> 
 chapter5/licensing-service/src/main/resources/application.yml
