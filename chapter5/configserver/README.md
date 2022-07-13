@@ -46,7 +46,8 @@ ostock/configserver        0.0.1-SNAPSHOT   b03f832d2cfb   7 minutes ago   442MB
 
 # The Run command using the docker
 # The Run command
-$ docker run -d --name "configserver" -p 8071:8071 ostock/configserver:0.0.1-SNAPSHOT
+#$ docker run -d --name "configserver" -p 8071:8071 ostock/configserver:0.0.1-SNAPSHOT
+$ docker run -d -p 8071:8071 ostock/configserver:0.0.1-SNAPSHOT
 $ docker ps
 CONTAINER ID   IMAGE                                COMMAND                  CREATED         STATUS         PORTS                                       NAMES
 c3fbf002187c   ostock/configserver:0.0.1-SNAPSHOT   "java -cp app:app/li…"   3 minutes ago   Up 3 minutes   0.0.0.0:8071->8071/tcp, :::8071->8071/tcp   configserver
@@ -58,8 +59,12 @@ c3fbf002187c   ostock/configserver:0.0.1-SNAPSHOT   "java -cp app:app/li…"   3
 $ cd chapter5/configserver
 
 # To run the code examples for Chapter 5 configsever, open a command-line 
-# window and execute the following command:
-$ mvn sprint-boot:run
+# window and execute the following command(1):
+$ mvn clean spring-boot:run
+
+# or window and execute the following command(2):
+$ mvn clean package spring-boot:repackage
+$ java -jar target/licensing-service-0.0.1-SNAPSHOT.jar
 
 # To check the configserver, run the application in the postman
 1. http://localhost:8071/actuator

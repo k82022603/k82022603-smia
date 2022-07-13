@@ -131,7 +131,7 @@ licensingservice_1  |  :: Spring Boot ::                (v2.7.1)
 licensingservice_1  |
 licensingservice_1  | 2022-07-11 07:44:00.637  INFO 1 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.2 on c4d6b2dddc8c with PID 1 (/app started by root in /)
 licensingservice_1  | 2022-07-11 07:44:00.640  INFO 1 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
-licensingservice_1  | 2022-07-11 07:44:00.709  INFO 1 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://192.168.5.7:8071
+licensingservice_1  | 2022-07-11 07:44:00.709  INFO 1 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
 licensingservice_1  | 2022-07-11 07:44:00.709  INFO 1 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=licensing-service, profiles=[dev], label=null, version=null, state=null
 licensingservice_1  | 2022-07-11 07:44:01.494  INFO 1 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
 licensingservice_1  | 2022-07-11 07:44:01.541  INFO 1 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 39 ms. Found 1 JPA repository interfaces.

@@ -59,12 +59,12 @@ ostock/licensing-service   0.0.1-SNAPSHOT   dd6fafa1cadc   33 seconds ago   459M
 
 # The Run command using the docker
 ## Changes to fix trouble shootings
-1. $ docker run ostock/licensing-service:0.0.1-SNAPSHOT
-2022-07-07 08:08:28.193 WARN 1 --- [ main] o.s.c.c.c.ConfigServerConfigDataLoader : Could not locate PropertySource ([ConfigServerConfigDataResource@1eb6749b uris = array<String>['[http://localhost:8071](http://localhost:8071/)'], optional = true, profiles = list['dev']]): I/O error on GET request for "[http://localhost:8071/licensing-service/dev](http://localhost:8071/licensing-service/dev)": Connection refused; nested exception is java.net.ConnectException: Connection refused
---> 
-chapter5/licensing-service/src/main/resources/application.yml
-    config: 
-      import: "optional:configserver:http://192.168.5.7:8071"
+# 1. $ docker run ostock/licensing-service:0.0.1-SNAPSHOT
+# 2022-07-07 08:08:28.193 WARN 1 --- [ main] o.s.c.c.c.ConfigServerConfigDataLoader : Could not locate PropertySource ([ConfigServerConfigDataResource@1eb6749b uris = array<String>['[http://localhost:8071](http://localhost:8071/)'], optional = true, profiles = list['dev']]): I/O error on GET request for "[http://localhost:8071/licensing-service/dev](http://localhost:8071/licensing-service/dev)": Connection refused; nested exception is java.net.ConnectException: Connection refused
+# --> 
+# chapter5/licensing-service/src/main/resources/application.yml
+#     config: 
+#       import: "optional:configserver:http://192.168.5.7:8071"
 
 2. org.postgresql.util.PSQLException: Connection to 192.168.5.7:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections
 -->
@@ -82,10 +82,35 @@ host all all 0.0.0.0/0 md5
 
 
 # The Run command
-$ docker run -d --name "licensing_service" -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+#$ docker run -d --name "licensing_service" -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+#$ docker run -d -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+$ docker run -d -it --add-host configserver:192.168.5.7 -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+src/main/resources/application.yml
+spring:
+    main:
+      allow-bean-definition-overriding: true
+    application:
+      name: licensing-service
+    profiles:
+      active: dev
+    config:
+      import: "optional:configserver:http://configserver:8071"
+
+<config server ip address>
+$ ifconfig 
+wlp1s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.5.7  netmask 255.255.255.0  broadcast 192.168.5.255
+        inet6 fe80::9bec:e1e3:237e:b6fa  prefixlen 64  scopeid 0x20<link>
+        ether a0:c5:89:99:36:3f  txqueuelen 1000  (Ethernet)
+        RX packets 63781  bytes 50496937 (50.4 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 43034  bytes 9759048 (9.7 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+
 $ docker ps
-CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-adb8f7af4e57   ostock/licensing-service:0.0.1-SNAPSHOT   "java -cp app:app/li…"   13 seconds ago   Up 10 seconds   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   licensing_service
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+50e9847c82c6   ostock/licensing-service:0.0.1-SNAPSHOT   "java -cp app:app/li…"   6 seconds ago   Up 3 seconds   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   inspiring_wilbur
 
 
 # The Run command using (2) mvn sprint-boot:run
@@ -100,14 +125,19 @@ $ mvn sprint-boot:run
 2022-07-11 14:07:01.840  WARN 16563 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@14f5da2c uris = array<String>['http://192.168.5.7:8071'], optional = true, profiles = list['dev']]): I/O error on GET request for "http://192.168.5.7:8071/licensing-service/dev": Connection refused; nested exception is java.net.ConnectException: Connection refused
 ....
 
-2. with running Spring Cloud Config service (chapter5/configserver)
+2. add configserver ip to /etc/hosts like below
+192.168.5.7     configserver
+
+3. with running Spring Cloud Config service (chapter5/configserver)
 $ mvn sprint-boot:run
 2022-07-11 15:19:23.614  INFO 23926 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 23926 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service)
 2022-07-11 15:19:23.616  INFO 23926 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
-2022-07-11 15:19:23.652  INFO 23926 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://192.168.5.7:8071
+2022-07-11 15:19:23.652  INFO 23926 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
 2022-07-11 15:19:23.653  INFO 23926 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=licensing-service, profiles=[dev], label=null, version=null, state=null
 ....
 
+4. remove configserver ip at /etc/hosts like below
+192.168.5.7     configserver
 
 # To check the configserver, run the application in the postman
 1. http://localhost:8080/actuator
@@ -161,16 +191,23 @@ or
 1. chapter5/licensing-service/src/main/resources/application.yml
 - profiles:
       active: prod 
+
 2. run Spring Cloud Config service (chapter5/configserver)
-3. run chapter5/licensing-service like as
-$ mvn spring-boot:run
+
+3. add configserver ip to /etc/hosts like below
+192.168.5.7     configserver
+
+4. run chapter5/licensing-service like as
+$ mvn clean spring-boot:run
 2022-07-11 14:16:41.576  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 17656 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service)
 2022-07-11 14:16:41.578  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "prod"
-2022-07-11 14:16:41.615  INFO 17656 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://192.168.5.7:8071
+2022-07-11 14:16:41.615  INFO 17656 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
 ....
 org.postgresql.util.PSQLException: The connection attempt failed.
 
 
+5. remove configserver ip at /etc/hosts like below
+192.168.5.7     configserver
 
 
 
