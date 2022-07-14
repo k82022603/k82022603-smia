@@ -125,19 +125,19 @@ $ mvn sprint-boot:run
 2022-07-11 14:07:01.840  WARN 16563 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@14f5da2c uris = array<String>['http://192.168.5.7:8071'], optional = true, profiles = list['dev']]): I/O error on GET request for "http://192.168.5.7:8071/licensing-service/dev": Connection refused; nested exception is java.net.ConnectException: Connection refused
 ....
 
-2. add configserver ip to /etc/hosts like below
-192.168.5.7     configserver
+2. chapter5/licensing-service/src/main/resources/application.yml
+- As adding "localhost:8071" at config.import, "mvn sprint-boot:run" works.
+    config: 
+      import: "optional:configserver:http://configserver:8071,optional:configserver:http://localhost:8071"
 
 3. with running Spring Cloud Config service (chapter5/configserver)
 $ mvn sprint-boot:run
-2022-07-11 15:19:23.614  INFO 23926 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 23926 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service)
-2022-07-11 15:19:23.616  INFO 23926 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
-2022-07-11 15:19:23.652  INFO 23926 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
-2022-07-11 15:19:23.653  INFO 23926 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=licensing-service, profiles=[dev], label=null, version=null, state=null
+2022-07-14 23:49:19.814  INFO 9055 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 9055 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service)
+2022-07-14 23:49:19.816  INFO 9055 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
+2022-07-14 23:49:19.848  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8071
+2022-07-14 23:49:19.849  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=licensing-service, profiles=[dev], label=null, version=null, state=null
+2022-07-14 23:49:19.849  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
 ....
-
-4. remove configserver ip at /etc/hosts like below
-192.168.5.7     configserver
 
 # To check the configserver, run the application in the postman
 1. http://localhost:8080/actuator
@@ -194,10 +194,7 @@ or
 
 2. run Spring Cloud Config service (chapter5/configserver)
 
-3. add configserver ip to /etc/hosts like below
-192.168.5.7     configserver
-
-4. run chapter5/licensing-service like as
+3. run chapter5/licensing-service like as
 $ mvn clean spring-boot:run
 2022-07-11 14:16:41.576  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 17656 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter5/licensing-service)
 2022-07-11 14:16:41.578  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "prod"
@@ -205,10 +202,3 @@ $ mvn clean spring-boot:run
 ....
 org.postgresql.util.PSQLException: The connection attempt failed.
 
-
-5. remove configserver ip at /etc/hosts like below
-192.168.5.7     configserver
-
-
-
-    

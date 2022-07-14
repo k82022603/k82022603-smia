@@ -2,15 +2,18 @@ spring:
   application:
     name: config-server
   profiles:
-    active: native
+    # native OR git OR native,git
+    active: git 
   cloud:
     config:
       server:
         native:
           search-locations: classpath:/config 
         git:
-          uri: https://github.com/ihuaylupo/config.git
-          searchPaths: licensingservice
+          uri: https://github.com/k82022603/k82022603-smia-config.git
+          refreshRate: 1
+          searchPaths: licensing-service
+          
 
 server:
   port: 8071

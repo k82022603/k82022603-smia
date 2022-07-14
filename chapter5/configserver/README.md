@@ -43,7 +43,6 @@ REPOSITORY                 TAG              IMAGE ID       CREATED         SIZE
 ostock/configserver        0.0.1-SNAPSHOT   b03f832d2cfb   7 minutes ago   442MB
 
 
-
 # The Run command using the docker
 # The Run command
 #$ docker run -d --name "configserver" -p 8071:8071 ostock/configserver:0.0.1-SNAPSHOT
@@ -90,8 +89,3 @@ or
 2. run http://localhost:8071/encrypt
 3. you can see the respnse like as "a77a03ca0269ae9a1eb214bdeee1e82a7feb2f643ee8e7f0e3cf5d8b91a60f15"
 
-
-
-
-
-    
