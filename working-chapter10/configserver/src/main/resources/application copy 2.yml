@@ -1,0 +1,62 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: config-server
+  profiles:
+    # native OR git OR native,git
+    active: native, vault
+  cloud:
+    vault: 
+      authentication: TOKEN    
+      token: hvs.CAESIJDgs37KmaZo-LrAPYAKEA7T-lFEkr3TjdG9WJLMTqi6Gh4KHGh2cy4xQzFUQVE0TGJmZFZTUDBjV2hSUm51dzI
+      # host: 127.0.0.1
+      # port: 8200
+      # scheme: http
+      # kvVersion: 2
+      # skipSslValidation: false
+      # timeout: 5          
+      # uri: http://localhost:8200
+      # connection-timeout: 5000
+      # read-timeout: 15000      
+      # kv:
+      #   enabled: true
+      #   backend: licensing-service
+      #   profileSeparator: "/"
+    config:
+      server:
+        native:
+          search-locations: classpath:/config 
+        git:
+          uri: https://github.com/k82022603/k82022603-smia-config.git
+          refreshRate: 1
+          searchPaths: licensing-service            
+        # vault: #https://cloud.spring.io/spring-cloud-config/reference/html/
+        #   host: 127.0.0.1
+        #   port: 8200
+        #   scheme: http
+        #   backend: licensing-service
+        #   profileSeparator: ","
+        #   kvVersion: 2
+        #   skipSslValidation: false
+        #   timeout: 5          
+        #   enabled: true
+        #   uri: http://localhost:8200
+        #   connection-timeout: 5000
+        #   read-timeout: 15000
+                      
+          
+    
+server:
+  port: 8071
+  
+encrypt:
+  key: fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo 
+
+
+#Enable all Spring Boot Actuator endpoints.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

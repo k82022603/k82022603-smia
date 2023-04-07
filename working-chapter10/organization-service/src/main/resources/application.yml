@@ -1,0 +1,27 @@
+spring:
+    main: 
+      allow-bean-definition-overriding: true
+    application:
+     name: organization-service 
+    profiles:
+      active: dev 
+    # All 3 types dev/test/prod include default property file
+    config: 
+      import: "optional:configserver:http://configserver:8071,optional:configserver:http://localhost:8071"
+    cloud:
+      config:
+        label: null 
+        # label is an optional git label (defaults to master)
+        # or use like belows in the cloudconfig server
+        # /{application}/{profile}[/{label}]
+        # /{application}-{profile}.yml
+        # /{label}/{application}-{profile}.yml
+        # /{application}-{profile}.properties
+        # /{label}/{application}-{profile}.properties
+
+
+logging:
+  level:
+    com.netflix: WARN
+    org.springframework.web: WARN
+    com.optimagrowth: DEBUG

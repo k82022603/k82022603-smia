@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.optimagrowth</groupId>
-	<artifactId>licensing-service</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
-	<name>License Service</name>
-	<description>Ostock Licensing Service</description>
+	<artifactId>organization-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Organization Service</name>
+	<description>Ostock Organization Service</description>
 
 	<properties>
 		<java.version>17</java.version>
@@ -62,12 +62,28 @@
 		    <groupId>org.postgresql</groupId>
 		    <artifactId>postgresql</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<exclusions>
+				<exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-ribbon</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.netflix.ribbon</groupId>
+                    <artifactId>ribbon-eureka</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
+	    <dependency>
+	    	<groupId>org.springframework.cloud</groupId>
+	    	<artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+          <dependency>
+	    	<groupId>org.springframework.cloud</groupId>
+	    	<artifactId>spring-cloud-starter-stream-kafka</artifactId>
+        </dependency>
 	</dependencies>
 	
 	<dependencyManagement>
@@ -113,5 +129,6 @@
 			</plugin>
 		</plugins>
 	</build>
+
 
 </project>

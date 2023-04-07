@@ -1,0 +1,21 @@
+spring:
+    main: 
+      allow-bean-definition-overriding: true
+    application:
+      name: eureka-server 
+    # All 3 types dev/test/prod include default property file
+    config: 
+      import: "optional:configserver:http://configserver:8071,optional:configserver:http://localhost:8071"
+    cloud:
+        loadbalancer:
+            ribbon:
+               enabled: false
+# spring:
+#     application:
+#      name: eureka-server 
+#     cloud:
+#         config: 
+#             uri: http://configserver:8071
+#         loadbalancer:
+#             ribbon:
+#                enabled: false

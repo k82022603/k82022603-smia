@@ -1,0 +1,293 @@
+## Spring Microservices in Action - Second Edition. Chapter 10 licensing-service
+
+# Introduction
+Welcome to Spring Microservices in Action, Chapter 10.  Chapter 10 introduces the Spring Cloud Config service and how you can use it managed the configuration of your microservices like as the licensing-service . By the time you are done reading this chapter you will have built and/or deployed:
+
+1. The licensing-service that is deployed as Docker container and can manage a services configuration information using a file system/ classpath or GitHub-based repository.
+
+## Initial Configuration
+1.	Apache Maven (http://maven.apache.org)  All of the code examples in this book have been compiled with Java version 11.
+2.	Git Client (http://git-scm.com)
+3.  Docker(https://www.docker.com/products/docker-desktop)
+
+## Changes
+1. chapter10/licensing-service/pom.xml 
+- spring-boot-starter-parent 2.2.3.RELEASE --> 2.7.1
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+- java version & spring-cloud version
+    <properties>
+		<java.version>17</java.version>
+		<spring-cloud.version>2021.0.3</spring-cloud.version>
+	</properties>
+2. chapter10/licensing-service/src/main/resources/application.yml
+- move bootstrap.yml to application.yml
+
+## Build & Run fail list
+$ mvn clean spring-boot:run
+1. 
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile (default-compile) on project licensing-service: Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x77ea806f) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x77ea806f -> [Help 1]
+--> pom.xml
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+2.
+[INFO] Attaching agents: []
+19:29:19.547 [main] DEBUG org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter - Application failed to start due to an exception
+org.springframework.cloud.commons.ConfigDataMissingEnvironmentPostProcessor$ImportException: No spring.config.import set
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+No spring.config.import property has been defined
+
+Action:
+
+Add a spring.config.import=configserver: property to your configuration.
+        If configuration is not required add spring.config.import=optional:configserver: instead.
+        To disable this check, set spring.cloud.config.enabled=false or
+        spring.cloud.config.import-check.enabled=false.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+--> chapter10/licensing-service/src/main/resources/application.yml
+spring:
+    main:
+      allow-bean-definition-overriding: true
+    application:
+     name: licensing-service 
+    profiles:
+      active: dev
+    cloud:
+        config: 
+            uri: http://configserver:8071
+------>
+spring:
+    main: 
+      allow-bean-definition-overriding: true
+    application:
+      name: licensing-service 
+    profiles:
+      active: dev 
+    # All 3 types dev/test/prod include default property file
+    config: 
+      import: "optional:configserver:http://configserver:8071,optional:configserver:http://localhost:8071"
+    cloud:
+      config:
+        label: null 
+        # label is an optional git label (defaults to master)
+        # or use like belows in the cloudconfig server
+        # /{application}/{profile}[/{label}]
+        # /{application}-{profile}.yml
+        # /{label}/{application}-{profile}.yml
+        # /{application}-{profile}.properties
+        # /{label}/{application}-{profile}.properties
+
+
+
+
+
+## How To Use
+
+To clone and run this application, you'll need [Git](https://git-scm.com), [Maven](https://maven.apache.org/), [Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). From your command line:
+
+```bash
+# Clone this repository
+$ git clone https://github.com/ihuaylupo/manning-smia
+
+# Go into the repository, by chaning to the directory where you have downloaded the 
+# chapter 10 source code
+$ cd chapter10/licensing-service/
+
+# Database
+You can find the database script as well in the docker directory.
+-- If you want "dev" environment, create schema "ostock_dev" and run the DDL/DML scripts in the "ostock_dev". It uses "spring.datasource.url=jdbc:postgresql://localhost:5432/ostock_dev"
+
+If not running postgresql, start it 
+$ sudo systemctl start postgresql.service
+
+## Changes
+1. chapter10/configserver/pom.xml 
+- java version & spring-cloud version
+	<properties>
+		<java.version>17</java.version>
+		<docker.image.prefix>ostock</docker.image.prefix>
+		<spring-cloud.version>2021.0.3</spring-cloud.version>
+	</properties>
+2. chapter10/configserver/src/main/resources/application.yml
+- move bootstrap.yml to application.yml
+
+
+
+
+# The build command (1) using Dockerfile
+## Changes
+1. chapter10/licensing-service/Dockerfile
+- java version & LABEL
+FROM openjdk:17-slim as build
+LABEL maintainer="k82022603 <k82022603@gmail.com>"
+FROM openjdk:17-slim
+
+## The build command
+- mvn clean package dockerfile:build
+- run "docker images" to find out the docker image
+REPOSITORY                 TAG              IMAGE ID       CREATED          SIZE
+ostock/licensing-service   0.0.1-SNAPSHOT   dd6fafa1cadc   33 seconds ago   459MB
+
+# The Run command using the docker
+## Changes to fix trouble shootings
+# 1. $ docker run ostock/licensing-service:0.0.1-SNAPSHOT
+# 2022-07-07 08:08:28.193 WARN 1 --- [ main] o.s.c.c.c.ConfigServerConfigDataLoader : Could not locate PropertySource ([ConfigServerConfigDataResource@1eb6749b uris = array<String>['[http://localhost:8071](http://localhost:8071/)'], optional = true, profiles = list['dev']]): I/O error on GET request for "[http://localhost:8071/licensing-service/dev](http://localhost:8071/licensing-service/dev)": Connection refused; nested exception is java.net.ConnectException: Connection refused
+# --> 
+# chapter10/licensing-service/src/main/resources/application.yml
+#     config: 
+#       import: "optional:configserver:http://192.168.5.7:8071"
+
+2. org.postgresql.util.PSQLException: Connection to 192.168.5.7:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections
+-->
+https://stackoverflow.com/questions/25641047/org-postgresql-util-psqlexception-fatal-no-pg-hba-conf-entry-for-host
+
+$ vi /etc/postgresql/14/main/postgresql.conf
+listen_addresses = 'localhost' --> listen_addresses = '*'
+
+3. org.postgresql.util.PSQLException: FATAL: no pg_hba.conf entry for host "172.17.0.2", user "postgres", database "ostock_dev", SSL encryption
+--> 
+https://stackoverflow.com/questions/25641047/org-postgresql-util-psqlexception-fatal-no-pg-hba-conf-entry-for-host
+$ vi /etc/postgresql/14/main/pg_hba.conf
+add a new row :
+host all all 0.0.0.0/0 md5
+
+
+# The Run command
+#$ docker run -d --name "licensing_service" -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+#$ docker run -d -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+$ docker run -d -it --add-host configserver:192.168.5.7 -p 8080:8080 ostock/licensing-service:0.0.1-SNAPSHOT
+src/main/resources/application.yml
+spring:
+    main:
+      allow-bean-definition-overriding: true
+    application:
+      name: licensing-service
+    profiles:
+      active: dev
+    config:
+      import: "optional:configserver:http://configserver:8071"
+
+<config server ip address>
+$ ifconfig 
+wlp1s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.5.7  netmask 255.255.255.0  broadcast 192.168.5.255
+        inet6 fe80::9bec:e1e3:237e:b6fa  prefixlen 64  scopeid 0x20<link>
+        ether a0:c5:89:99:36:3f  txqueuelen 1000  (Ethernet)
+        RX packets 63781  bytes 50496937 (50.4 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 43034  bytes 9759048 (9.7 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+
+$ docker ps
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+50e9847c82c6   ostock/licensing-service:0.0.1-SNAPSHOT   "java -cp app:app/li…"   6 seconds ago   Up 3 seconds   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   inspiring_wilbur
+
+
+# The Run command using (2) mvn sprint-boot:run
+# To run the code examples for Chapter 10 configsever, open a command-line 
+# window and execute the following command:
+1. without running Spring Cloud Config service (chapter10/configserver)
+$ mvn sprint-boot:run
+2022-07-11 14:07:01.798  INFO 16563 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 16563 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service)
+2022-07-11 14:07:01.800  INFO 16563 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
+2022-07-11 14:07:01.840  INFO 16563 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://192.168.5.7:8071
+2022-07-11 14:07:01.840  INFO 16563 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Connect Timeout Exception on Url - http://192.168.5.7:8071. Will be trying the next url if available
+2022-07-11 14:07:01.840  WARN 16563 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@14f5da2c uris = array<String>['http://192.168.5.7:8071'], optional = true, profiles = list['dev']]): I/O error on GET request for "http://192.168.5.7:8071/licensing-service/dev": Connection refused; nested exception is java.net.ConnectException: Connection refused
+....
+
+2. chapter10/licensing-service/src/main/resources/application.yml
+- As adding "localhost:8071" at config.import, "mvn sprint-boot:run" works.
+    config: 
+      import: "optional:configserver:http://configserver:8071,optional:configserver:http://localhost:8071"
+
+3. with running Spring Cloud Config service (chapter10/configserver)
+$ mvn sprint-boot:run
+2022-07-14 23:49:19.814  INFO 9055 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 9055 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service)
+2022-07-14 23:49:19.816  INFO 9055 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "dev"
+2022-07-14 23:49:19.848  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8071
+2022-07-14 23:49:19.849  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=licensing-service, profiles=[dev], label=null, version=null, state=null
+2022-07-14 23:49:19.849  INFO 9055 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
+....
+
+# To check the configserver, run the application in the postman
+1. http://localhost:8080/actuator
+2. you can see the reponse like as
+{
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/actuator",
+            "templated": false
+        },
+        "health": {
+            "href": "http://localhost:8080/actuator/health",
+            "templated": false
+        },
+        "health-path": {
+            "href": "http://localhost:8080/actuator/health/{*path}",
+            "templated": true
+        }
+    }
+}
+or
+1. http://localhost:8080/v1/organization/d898a142-de44-466c-8c88-9ceb2c2429d3/license/f2a9c9d4-d2c0-44fa-97fe-724d77173c62
+2. you can see the respnse like as 
+{
+    "licenseId": "f2a9c9d4-d2c0-44fa-97fe-724d77173c62",
+    "description": "Software Product",
+    "organizationId": "d898a142-de44-466c-8c88-9ceb2c2429d3",
+    "productName": "Ostock",
+    "licenseType": "complete",
+    "comment": null,
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/v1/organization/d898a142-de44-466c-8c88-9ceb2c2429d3/license/f2a9c9d4-d2c0-44fa-97fe-724d77173c62"
+        },
+        "createLicense": {
+            "href": "http://localhost:8080/v1/organization/{organizationId}/license",
+            "templated": true
+        },
+        "updateLicense": {
+            "href": "http://localhost:8080/v1/organization/{organizationId}/license",
+            "templated": true
+        },
+        "deleteLicense": {
+            "href": "http://localhost:8080/v1/organization/{organizationId}/license/f2a9c9d4-d2c0-44fa-97fe-724d77173c62",
+            "templated": true
+        }
+    }
+}
+
+# To check referencing the configserver, change like below and run 
+1. chapter10/licensing-service/src/main/resources/application.yml
+- profiles:
+      active: prod 
+
+2. run Spring Cloud Config service (chapter10/configserver)
+
+3. run chapter10/licensing-service like as
+$ mvn clean spring-boot:run
+2022-07-11 14:16:41.576  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : Starting LicenseServiceApplication using Java 17.0.3 on jeff01 with PID 17656 (/home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service/target/classes started by jeff in /home/jeff/SpringMicroservicesInAction/k82022603-smia/chapter10/licensing-service)
+2022-07-11 14:16:41.578  INFO 17656 --- [           main] c.o.license.LicenseServiceApplication    : The following 1 profile is active: "prod"
+2022-07-11 14:16:41.615  INFO 17656 --- [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://configserver:8071
+....
+org.postgresql.util.PSQLException: The connection attempt failed.
+

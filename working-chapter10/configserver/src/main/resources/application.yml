@@ -1,0 +1,47 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: config-server
+  profiles:
+    # native OR git OR native,git
+    active: native
+  cloud:
+    vault:
+      authentication: TOKEN    
+      token: hvs.q8RwPDTCuEW7L4EvvIegkR9K
+      port: 8200
+      host: 127.0.0.1
+      kvVersion: 2
+      backend: licensing-service      
+    config:
+      server:
+        vault:
+          port: 8200
+          host: 127.0.0.1
+          kvVersion: 2
+          backend: licensing-service
+        native:
+          search-locations: classpath:/config 
+        git:
+          uri: https://github.com/k82022603/k82022603-smia-config.git
+          refreshRate: 1
+          searchPaths: licensing-service            
+                      
+          
+    
+server:
+  port: 8071
+
+#for test
+#if you run in PRODUCTION, erase below 2 lines and do "export ENCRYPT_KEY=fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo" at the configserver LINUX
+encrypt:
+  key: fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo 
+#for test
+
+#Enable all Spring Boot Actuator endpoints.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
